@@ -8,7 +8,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
                 return getMapResponse(event);
             }
             case 'OPTIONS': {
-                return getPreflightResponse(event);
+                return { statusCode: 200, headers: getCorsHeaders(event) };
             }
             default: {
                 return { statusCode: 400, body: 'Bad request' };
@@ -16,7 +16,7 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
         }
     } catch (e) {
         console.error(e);
-        return { statusCode: 500, body: 'Unexpected error' };
+        return { statusCode: 500, body: `Unexpected error (${e})` };
     }
 }
 
@@ -37,13 +37,13 @@ async function getMapResponse(event: HandlerEvent) {
             };
         }
 
-        return { statusCode: 200, headers: { 'Content-Type': 'text/plain' }, body: mapData.content };
+        return { statusCode: 200, headers: { 'Content-Type': 'text/plain', ...getCorsHeaders(event) }, body: mapData.content };
     } catch (e) {
         return { statusCode: 500, body: `Failed to load map data (${e})` };
     }
 }
 
-function getPreflightResponse(event: HandlerEvent) {
+function getCorsHeaders(event: HandlerEvent) {
     const allowedOrigins: string[] = [
         'https://lagrange-data.netlify.app',
         'https://yosuzuk.github.io',
@@ -52,19 +52,13 @@ function getPreflightResponse(event: HandlerEvent) {
 
     const allowedOrigin = allowedOrigins.filter(allowedOrigin => allowedOrigin === (event.headers.origin ?? ''))[0];
     if (!allowedOrigin) {
-        return {
-            statusCode: 403,
-            body: `Unknown origin "${event.headers.origin}"`,
-        };
+        throw new Error('Unknown origin');
     }
 
     return {
-        statusCode: 200,
-        headers: {
-            'Access-Control-Allow-Origin': allowedOrigin,
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Allow-Methods': 'GET, OPTIONS'
-        },
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS'
     };
 }
 
