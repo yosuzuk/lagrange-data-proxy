@@ -47,7 +47,7 @@ function getCorsHeaders(event: HandlerEvent) {
     const allowedOrigins: string[] = [
         'https://lagrange-data.netlify.app',
         'https://yosuzuk.github.io',
-        'http://localhost',
+        'http://localhost:3000',
     ];
 
     const allowedOrigin = allowedOrigins.filter(allowedOrigin => allowedOrigin === (event.headers.origin ?? ''))[0];
