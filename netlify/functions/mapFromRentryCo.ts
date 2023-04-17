@@ -5,25 +5,28 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     try {
         switch (event.httpMethod) {
             case 'GET': {
-                return getMapResponse(event);
+                return loadMap(event);
+            }
+            case 'PUT': {
+                return saveMap(event);
             }
             case 'OPTIONS': {
                 return { statusCode: 200, headers: getCorsHeaders(event) };
             }
             default: {
-                return { statusCode: 400, body: 'Bad request' };
+                return { statusCode: 400, body: 'Bad request', headers: getCorsHeaders(event) };
             }
         }
     } catch (e) {
         console.error(e);
-        return { statusCode: 500, body: `Unexpected error (${e})` };
+        return { statusCode: 500, body: `Unexpected error (${e})`, headers: getCorsHeaders(event) };
     }
 }
 
-async function getMapResponse(event: HandlerEvent) {
+async function loadMap(event: HandlerEvent) {
     const id = event.queryStringParameters?.map;
     if (!id) {
-        return { statusCode: 400 };
+        return { statusCode: 400, headers: getCorsHeaders(event) };
     }
 
     try {
@@ -39,7 +42,39 @@ async function getMapResponse(event: HandlerEvent) {
 
         return { statusCode: 200, headers: { 'Content-Type': 'text/plain', ...getCorsHeaders(event) }, body: mapData.content };
     } catch (e) {
-        return { statusCode: 500, body: `Failed to load map data (${e})` };
+        return { statusCode: 500, body: `Failed to load map data (${e})`, headers: getCorsHeaders(event) };
+    }
+}
+
+async function saveMap(event: HandlerEvent) {
+    const { map: id, key } = event.queryStringParameters ?? {};
+    if (!id || !key) {
+        return { statusCode: 400, headers: getCorsHeaders(event) };
+    }
+
+    const csrftoken = getCsrfToken();
+    if (!csrftoken) {
+        return { statusCode: 500, body: 'failed to extract token', headers: getCorsHeaders(event) };
+    }
+
+    const payload = {
+        csrfmiddlewaretoken: csrftoken,
+        'edit_code': key,
+        text: event.body,
+    };
+
+    try {
+        await axios.post(`https://rentry.co/api/edit/${id}`, payload, {
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8',
+                Referer: 'https://rentry.co', // so weird... but taken from their official example
+            },
+        });
+
+        return { statusCode: 200, headers: getCorsHeaders(event) };
+
+    } catch (e) {
+        return { statusCode: 500, body: `Failed to save map data (${e})`, headers: getCorsHeaders(event) };
     }
 }
 
@@ -60,6 +95,11 @@ function getCorsHeaders(event: HandlerEvent) {
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'GET, OPTIONS'
     };
+}
+
+async function getCsrfToken() {
+    // so weird... but taken from their official example
+    return `${(await axios.get('https://rentry.co')).headers['set-cookie']}`.split('; ')[0]?.split('=')[1] ?? null;
 }
 
 export { handler };
