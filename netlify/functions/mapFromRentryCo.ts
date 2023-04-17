@@ -57,12 +57,6 @@ async function saveMap(event: HandlerEvent) {
         return { statusCode: 500, body: 'failed to extract token', headers: getCorsHeaders(event) };
     }
 
-    console.log({
-        csrftoken,
-        key,
-        text: `${event.body}`,
-    });
-
     const bodyFormData = new FormData();
     bodyFormData.append('csrfmiddlewaretoken', csrftoken);
     bodyFormData.append('edit_code', key);
@@ -75,6 +69,7 @@ async function saveMap(event: HandlerEvent) {
             data: bodyFormData,
             headers: {
                 'Content-Type': 'multipart/form-data',
+                Cookie: `csrftoken=${csrftoken};`,
                 Referer: 'https://rentry.co', // so weird... but taken from their official example
             },
         });
