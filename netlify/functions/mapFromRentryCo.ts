@@ -93,7 +93,7 @@ function getCorsHeaders(event: HandlerEvent) {
     return {
         'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS'
+        'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS'
     };
 }
 
