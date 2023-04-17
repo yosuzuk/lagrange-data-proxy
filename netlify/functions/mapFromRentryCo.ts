@@ -1,5 +1,5 @@
-import { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 import axios from 'axios';
+import { Handler, HandlerEvent, HandlerContext } from '@netlify/functions';
 
 const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
     try {
