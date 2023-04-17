@@ -52,21 +52,23 @@ async function saveMap(event: HandlerEvent) {
         return { statusCode: 400, headers: getCorsHeaders(event) };
     }
 
-    const csrftoken = getCsrfToken();
+    const csrftoken = await getCsrfToken();
     if (!csrftoken) {
         return { statusCode: 500, body: 'failed to extract token', headers: getCorsHeaders(event) };
     }
 
-    const payload = {
-        csrfmiddlewaretoken: csrftoken,
-        'edit_code': key,
-        text: event.body,
-    };
+    const bodyFormData = new FormData();
+    bodyFormData.append('csrfmiddlewaretoken', csrftoken);
+    bodyFormData.append('edit_code', key);
+    bodyFormData.append('text', `${event.body}`);
 
     try {
-        await axios.post(`https://rentry.co/api/edit/${id}`, payload, {
+        await axios({
+            method: 'post',
+            url: `https://rentry.co/api/edit/${id}`,
+            data: bodyFormData,
             headers: {
-                'Content-Type': 'application/json;charset=utf-8',
+                'Content-Type': 'multipart/form-data',
                 Referer: 'https://rentry.co', // so weird... but taken from their official example
             },
         });
