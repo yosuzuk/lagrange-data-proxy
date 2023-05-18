@@ -39,4 +39,9 @@ https://maps-for-my-union.netlify.app/.netlify/functions/mapFromRentryCo?map=abc
 
 If the page can successfully load the map, it will store the given backend URL in the browser's localStorage (you won't have to paste it again).
 
-After opening your map, you can copy the URL from your adress bar to share it with others.
+## Sharing maps with others
+
+After opening your map, you can copy the map URL from your adress bar to share it with others.
+
+The map URL will directly open your map. Your backend URL is embedded in it, so others can directly open your map without configuring a backend URL themself.
+
