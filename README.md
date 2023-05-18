@@ -1,11 +1,11 @@
 # lagrange-data-proxy
 
-This `lagrange-data-proxy` is a [Netlify function](https://www.netlify.com/products/functions/) for loading and saving star system maps using [Rentry.co](https://rentry.co/). It can be configured as "backend" for the `lagrange data` site.
+This `lagrange-data-proxy` is a [Netlify function](https://www.netlify.com/products/functions/) for loading and saving star system maps using [Rentry.co](https://rentry.co/). It can be configured as your organization's private "backend" for the `lagrange data` site.
 
 ## Setup deployment
 
 - Create a [Netlify](https://www.netlify.com/) account
-- Clone this repository
+- Clone or fork this repository to your own GitHub account
 - Link the cloned respository to your Netlify account
   - Go to your Netlify team overview page
   - Click "Add new site" -> "Import existing project"
