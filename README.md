@@ -45,5 +45,5 @@ If the page can successfully load the map, it will store the given backend URL i
 
 After opening your map, you can copy the map URL from your adress bar to share it with others.
 
-The map URL will directly open your map. Your backend URL is embedded in it, so others can directly open your map without configuring a backend URL themself.
+The map URL will directly open your map. Your backend URL is embedded in it, so others can directly open your map without configuring a backend URL themself. But because of that, your backend URL is kind of visible to everyone who knows your map URL. The free-tier of Netlify functions allows up to 125k requests per month, which is more than enough, but it's your bill if anything happens.
 
