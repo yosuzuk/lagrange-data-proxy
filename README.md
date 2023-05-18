@@ -13,6 +13,8 @@ This `lagrange-data-proxy` is a [Netlify function](https://www.netlify.com/produ
   - Configure a site name (e.g. "maps-for-my-union")
   - Check if it's deploying
 
+(see [Netlify's documentation](https://docs.netlify.com/functions/overview/) on how to deploy functions if necessary)
+
 ## Creating a map on Rentry.co
 
 - Go to [Rentry.co](https://rentry.co/)
