@@ -86,7 +86,7 @@ async function saveMap(event: HandlerEvent) {
             },
             headers: {
                 Cookie: `csrftoken=${csrftoken};`,
-                Referer: 'https://rentry.co', // so weird... but taken from their official example
+                Referer: 'https://rentry.co',
             },
         });
 
@@ -117,7 +117,6 @@ function getCorsHeaders(event: HandlerEvent) {
 }
 
 async function getCsrfToken() {
-    // so weird... but taken from their official example
     return `${(await axios.get('https://rentry.co')).headers['set-cookie']}`.split('; ')[0]?.split('=')[1] ?? null;
 }
 
