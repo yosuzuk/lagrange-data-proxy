@@ -42,6 +42,7 @@ async function loadMap(event: HandlerEvent) {
     try {
         const response = await axios.post(`https://rentry.co/api/raw/${id}`, {
             headers: {
+                'Referer': 'https://rentry.co',
                 'Cookie': `csrftoken=${csrftoken};`,
                 'rentry-auth': rentryAuth,
             },
