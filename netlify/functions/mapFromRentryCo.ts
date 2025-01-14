@@ -40,15 +40,19 @@ async function loadMap(event: HandlerEvent) {
     }
 
     try {
-        const response = await axios.post(`https://rentry.co/api/raw/${id}`, {
-            headers: {
-                'Referer': 'https://rentry.co',
-                'Cookie': `csrftoken=${csrftoken};`,
-                'rentry-auth': rentryAuth,
-            },
-            data: {
-                'csrfmiddlewaretoken': csrftoken,
-            },
+        const headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Referer': 'https://rentry.co',
+            'Cookie': `csrftoken=${csrftoken};`,
+            'rentry-auth': rentryAuth,
+        };
+
+        const data = {
+            'csrfmiddlewaretoken': csrftoken,
+        };
+
+        const response = await axios.post(`https://rentry.co/api/raw/${id}`, data, {
+            headers,
             withCredentials: true,
         });
 
@@ -78,18 +82,19 @@ async function saveMap(event: HandlerEvent) {
     }
 
     try {
-        await axios({
-            method: 'post',
-            url: `https://rentry.co/api/edit/${id}`,
-            data: {
-                'csrfmiddlewaretoken': csrftoken,
-                'edit_code': key,
-                'text': `${event.body}`,
-            },
-            headers: {
-                Cookie: `csrftoken=${csrftoken};`,
-                Referer: 'https://rentry.co',
-            },
+        const headers = {
+            Cookie: `csrftoken=${csrftoken};`,
+            Referer: 'https://rentry.co',
+        };
+
+        const data = {
+            'csrfmiddlewaretoken': csrftoken,
+            'edit_code': key,
+            'text': `${event.body}`,
+        };
+
+        await axios.post(`https://rentry.co/api/edit/${id}`, data, {
+            headers,
             withCredentials: true,
         });
 
