@@ -101,11 +101,7 @@ async function saveMap(event: HandlerEvent) {
 }
 
 function getCorsHeaders(event: HandlerEvent) {
-    const allowedOrigins: string[] = [
-        'https://lagrange-data.netlify.app',
-        'https://yosuzuk.github.io',
-        'http://localhost:3000',
-    ];
+    const allowedOrigins: string[] = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 
     const allowedOrigin = allowedOrigins.filter(allowedOrigin => allowedOrigin === (event.headers.origin ?? ''))[0];
     if (!allowedOrigin) {
