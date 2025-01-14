@@ -29,8 +29,32 @@ async function loadMap(event: HandlerEvent) {
         return { statusCode: 400, headers: getCorsHeaders(event) };
     }
 
+    const rentryAuth = process.env.SECRET_RAW_ACCESS_CODE ?? '';
+    if (!rentryAuth) {
+        return { statusCode: 401, body: 'Missing access code', headers: getCorsHeaders(event) };
+    }
+
+    const csrftoken = await getCsrfToken();
+    if (!csrftoken) {
+        return { statusCode: 500, body: 'failed to extract token', headers: getCorsHeaders(event) };
+    }
+
     try {
-        const response = await axios.get(`https://rentry.co/api/raw/${id}`);
+        const headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Referer': 'https://rentry.co',
+            'Cookie': `csrftoken=${csrftoken};`,
+            'rentry-auth': rentryAuth,
+        };
+
+        const data = {
+            'csrfmiddlewaretoken': csrftoken,
+        };
+
+        const response = await axios.post(`https://rentry.co/api/raw/${id}`, data, {
+            headers,
+            withCredentials: true,
+        });
 
         const mapData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
         if (typeof mapData.content !== 'string') {
@@ -57,21 +81,21 @@ async function saveMap(event: HandlerEvent) {
         return { statusCode: 500, body: 'failed to extract token', headers: getCorsHeaders(event) };
     }
 
-    const bodyFormData = new FormData();
-    bodyFormData.append('csrfmiddlewaretoken', csrftoken);
-    bodyFormData.append('edit_code', key);
-    bodyFormData.append('text', `${event.body}`);
-
     try {
-        await axios({
-            method: 'post',
-            url: `https://rentry.co/api/edit/${id}`,
-            data: bodyFormData,
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Cookie: `csrftoken=${csrftoken};`,
-                Referer: 'https://rentry.co', // so weird... but taken from their official example
-            },
+        const headers = {
+            Cookie: `csrftoken=${csrftoken};`,
+            Referer: 'https://rentry.co',
+        };
+
+        const data = {
+            'csrfmiddlewaretoken': csrftoken,
+            'edit_code': key,
+            'text': `${event.body}`,
+        };
+
+        await axios.post(`https://rentry.co/api/edit/${id}`, data, {
+            headers,
+            withCredentials: true,
         });
 
         return { statusCode: 200, headers: getCorsHeaders(event) };
@@ -82,11 +106,7 @@ async function saveMap(event: HandlerEvent) {
 }
 
 function getCorsHeaders(event: HandlerEvent) {
-    const allowedOrigins: string[] = [
-        'https://lagrange-data.netlify.app',
-        'https://yosuzuk.github.io',
-        'http://localhost:3000',
-    ];
+    const allowedOrigins: string[] = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 
     const allowedOrigin = allowedOrigins.filter(allowedOrigin => allowedOrigin === (event.headers.origin ?? ''))[0];
     if (!allowedOrigin) {
@@ -101,7 +121,6 @@ function getCorsHeaders(event: HandlerEvent) {
 }
 
 async function getCsrfToken() {
-    // so weird... but taken from their official example
     return `${(await axios.get('https://rentry.co')).headers['set-cookie']}`.split('; ')[0]?.split('=')[1] ?? null;
 }
 
