@@ -49,6 +49,7 @@ async function loadMap(event: HandlerEvent) {
             data: {
                 'csrfmiddlewaretoken': csrftoken,
             },
+            withCredentials: true,
         });
 
         const mapData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
@@ -89,6 +90,7 @@ async function saveMap(event: HandlerEvent) {
                 Cookie: `csrftoken=${csrftoken};`,
                 Referer: 'https://rentry.co',
             },
+            withCredentials: true,
         });
 
         return { statusCode: 200, headers: getCorsHeaders(event) };
