@@ -15,6 +15,13 @@ This `lagrange-data-proxy` is a [Netlify function](https://www.netlify.com/produ
 
 (see [Netlify's documentation](https://docs.netlify.com/functions/overview/) on how to deploy functions if necessary)
 
+## Environment variables
+
+- "RENTRY_AUTH" - your auth code for using Rentry's API (required)
+- "ALLOWED_ORIGINS" - one or multiple comma-separated origins for CORS headers (optional)
+
+(see [Netlify's documentation](https://docs.netlify.com/environment-variables/overview/) on how to configure environment variables)
+
 ## Creating a map on Rentry.co
 
 - Go to [Rentry.co](https://rentry.co/)

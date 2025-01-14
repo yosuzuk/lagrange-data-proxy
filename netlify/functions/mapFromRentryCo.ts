@@ -29,9 +29,9 @@ async function loadMap(event: HandlerEvent) {
         return { statusCode: 400, headers: getCorsHeaders(event) };
     }
 
-    const rentryAuth = process.env.SECRET_RAW_ACCESS_CODE ?? '';
+    const rentryAuth = process.env.RENTRY_AUTH ?? '';
     if (!rentryAuth) {
-        return { statusCode: 401, body: 'Missing access code', headers: getCorsHeaders(event) };
+        return { statusCode: 401, body: 'Missing auth code for Rentry API', headers: getCorsHeaders(event) };
     }
 
     const csrftoken = await getCsrfToken();
@@ -106,7 +106,11 @@ async function saveMap(event: HandlerEvent) {
 }
 
 function getCorsHeaders(event: HandlerEvent) {
-    const allowedOrigins: string[] = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+    const allowedOrigins: string[] = [
+        ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : []),
+        'https://lagrange-data.netlify.app',
+        'https://yosuzuk.github.io',
+    ];
 
     const allowedOrigin = allowedOrigins.filter(allowedOrigin => allowedOrigin === (event.headers.origin ?? ''))[0];
     if (!allowedOrigin) {
